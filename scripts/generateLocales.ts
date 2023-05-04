@@ -260,29 +260,37 @@ function updateLocaleFileHook(
 ): void {
   function normalizeData<T>(localeData: T): T {
     if (Array.isArray(localeData)) {
-      localeData = [...new Set(localeData)]
-        // limit entries to 1k
-        .slice(0, 1000)
-        // sort entries alphabetically
-        .sort() as T;
+      return (
+        [...new Set(localeData)]
+          // limit entries to 1k
+          .slice(0, 1000)
+          // sort entries alphabetically
+          .sort() as T
+      );
     } else if (localeData === null) {
-      // not applicable
+      return null as T;
     } else if (typeof localeData === 'object') {
       for (const key of Object.keys(localeData)) {
         localeData[key] = normalizeData(localeData[key]);
       }
-    } else {
-      console.log('Unhandled content type:', filePath);
+
+      return localeData;
     }
 
-    return localeData;
+    throw new Error(`Cannot normalize content type: ${filePath}`);
   }
 
+  // this needs to stay so all arguments are "used"
   if (filePath === 'never') {
     console.log(`${filePath} <-> ${locale} @ ${localePath.join(' -> ')}`);
   }
 
-  const filesToSkip = ['metadata.ts'];
+  const filesToSkip = [
+    'metadata.ts',
+    // mapping objects
+    'street_address.ts',
+    'postcode_by_state.ts',
+  ];
   const fileName = basename(filePath);
   if (filesToSkip.includes(fileName)) {
     return;
@@ -305,19 +313,11 @@ function updateLocaleFileHook(
 
   const isFrozenData = compareString.startsWith('Object.freeze');
   if (isFrozenData) {
-    console.log('frozen file:', filePath);
     return;
   }
 
-  const dataListSyntaxMap: Record<string, string> = {
-    '[': ']',
-    '{': '}',
-  };
-  const staticFileOpenSyntax = Object.keys(dataListSyntaxMap).find(
-    (validStart) => compareString.startsWith(validStart)
-  );
-  if (staticFileOpenSyntax === undefined) {
-    console.log('Found dynamic file:', filePath);
+  const isStaticFile = ['[', '{'].includes(compareString[0]);
+  if (!isStaticFile) {
     return;
   }
 
