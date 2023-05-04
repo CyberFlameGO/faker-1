@@ -2,13 +2,13 @@
 export default {
   wide: [
     'domingo',
+    'jueves',
     'lunes',
     'martes',
     'miércoles',
-    'jueves',
-    'viernes',
     'sábado',
+    'viernes',
   ],
-  abbr: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-  abbr_context: ['dom.', 'lun.', 'mart.', 'miérc.', 'juev.', 'vier.', 'sáb.'],
+  abbr: ['dom', 'jue', 'lun', 'mar', 'mié', 'sáb', 'vie'],
+  abbr_context: ['dom.', 'juev.', 'lun.', 'mart.', 'miérc.', 'sáb.', 'vier.'],
 };

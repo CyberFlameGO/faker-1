@@ -1,22 +1,22 @@
 export default {
   wide: [
     'Dimanche',
+    'Jeudi',
     'Lundi',
     'Mardi',
     'Mercredi',
-    'Jeudi',
-    'Vendredi',
     'Samedi',
+    'Vendredi',
   ],
   wide_context: [
     'dimanche',
+    'jeudi',
     'lundi',
     'mardi',
     'mercredi',
-    'jeudi',
-    'vendredi',
     'samedi',
+    'vendredi',
   ],
-  abbr: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-  abbr_context: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
+  abbr: ['Dim', 'Jeu', 'Lun', 'Mar', 'Mer', 'Sam', 'Ven'],
+  abbr_context: ['dim', 'jeu', 'lun', 'mar', 'mer', 'sam', 'ven'],
 };

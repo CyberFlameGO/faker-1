@@ -1,12 +1,12 @@
 export default {
   wide: [
     'Chủ nhật',
-    'Thứ hai',
     'Thứ ba',
-    'Thứ tư',
+    'Thứ bảy',
+    'Thứ hai',
     'Thứ năm',
     'Thứ sáu',
-    'Thứ bảy',
+    'Thứ tư',
   ],
   abbr: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
   abbr_context: [

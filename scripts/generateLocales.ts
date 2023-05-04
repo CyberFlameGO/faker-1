@@ -19,7 +19,7 @@ import {
   readFileSync,
   writeFileSync,
 } from 'node:fs';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 import type { Options } from 'prettier';
 import { format } from 'prettier';
 import options from '../.prettierrc.cjs';
@@ -258,34 +258,73 @@ function updateLocaleFileHook(
   locale: string,
   localePath: string[]
 ): void {
+  function normalizeData<T>(localeData: T): T {
+    if (Array.isArray(localeData)) {
+      localeData = [...new Set(localeData)]
+        // limit entries to 1k
+        .slice(0, 1000)
+        // sort entries alphabetically
+        .sort() as T;
+    } else if (localeData === null) {
+      // not applicable
+    } else if (typeof localeData === 'object') {
+      for (const key of Object.keys(localeData)) {
+        localeData[key] = normalizeData(localeData[key]);
+      }
+    } else {
+      console.log('Unhandled content type:', filePath);
+    }
+
+    return localeData;
+  }
+
   if (filePath === 'never') {
     console.log(`${filePath} <-> ${locale} @ ${localePath.join(' -> ')}`);
+  }
+
+  const filesToSkip = ['metadata.ts'];
+  const fileName = basename(filePath);
+  if (filesToSkip.includes(fileName)) {
+    return;
   }
 
   const fileContent = readFileSync(filePath).toString();
   const searchString = 'export default ';
   const compareIndex = fileContent.indexOf(searchString) + searchString.length;
-  const compareChar = fileContent.substring(compareIndex);
-  const isStaticFile = ['[', '{', 'Object.freeze'].some((validStart) =>
-    compareChar.startsWith(validStart)
-  );
-  if (!isStaticFile) {
+  const compareString = fileContent.substring(compareIndex);
+
+  const isDynamicFile = compareString.startsWith('mergeArrays');
+  if (isDynamicFile) {
     return;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  let localeContent = require(filePath).default;
-  if (Array.isArray(localeContent)) {
-    // require unique entires
-    localeContent = [...new Set(localeContent)];
-    // require 1k entries max
-    localeContent = localeContent.slice(0, 1000);
-    // require entries to be alphabetically sorted
-    localeContent = localeContent.sort();
+  const isNonApplicable = compareString.startsWith('null');
+  if (isNonApplicable) {
+    return;
+  }
+
+  const isFrozenData = compareString.startsWith('Object.freeze');
+  if (isFrozenData) {
+    console.log('frozen file:', filePath);
+    return;
+  }
+
+  const dataListSyntaxMap: Record<string, string> = {
+    '[': ']',
+    '{': '}',
+  };
+  const staticFileOpenSyntax = Object.keys(dataListSyntaxMap).find(
+    (validStart) => compareString.startsWith(validStart)
+  );
+  if (staticFileOpenSyntax === undefined) {
+    console.log('Found dynamic file:', filePath);
+    return;
   }
 
   const fileContentPreData = fileContent.substring(0, compareIndex);
-  const newContent = fileContentPreData + JSON.stringify(localeContent);
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const localeData = normalizeData(require(filePath).default);
+  const newContent = fileContentPreData + JSON.stringify(localeData);
 
   writeFileSync(filePath, format(newContent, prettierTsOptions));
 }
