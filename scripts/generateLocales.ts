@@ -313,11 +313,13 @@ function updateLocaleFileHook(
     return;
   }
 
+  // todo: delete - checked via data normalization
   const isNonApplicable = compareString.startsWith('null');
   if (isNonApplicable) {
     return;
   }
 
+  // todo: delete - we ignore frozen
   const isFrozenData = compareString.startsWith('Object.freeze');
   if (isFrozenData) {
     return;
