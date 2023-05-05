@@ -291,12 +291,7 @@ function updateLocaleFileHook(
     console.log(`${filePath} <-> ${locale} @ ${localePath.join(' -> ')}`);
   }
 
-  const filesToSkip = [
-    'metadata.ts',
-    // mapping objects
-    'street_address.ts',
-    'postcode_by_state.ts',
-  ];
+  const filesToSkip = ['metadata.ts'];
   const fileName = basename(filePath);
   if (filesToSkip.includes(fileName)) {
     return;
