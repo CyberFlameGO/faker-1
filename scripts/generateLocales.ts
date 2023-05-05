@@ -259,7 +259,16 @@ function updateLocaleFileHook(
   localePath: string[]
 ): void {
   function normalizeData<T>(localeData: T): T {
-    if (Array.isArray(localeData)) {
+    if (
+      typeof localeData === 'string' ||
+      typeof localeData === 'number' ||
+      typeof localeData === 'boolean'
+    ) {
+      console.log('found primitive locale data', filePath);
+      return localeData;
+    } else if (localeData === null) {
+      return localeData;
+    } else if (Array.isArray(localeData)) {
       return (
         [...new Set(localeData)]
           // limit entries to 1k
@@ -267,10 +276,8 @@ function updateLocaleFileHook(
           // sort entries alphabetically
           .sort() as T
       );
-    } else if (localeData === null) {
-      return null as T;
     } else if (typeof localeData === 'object') {
-      for (const key of Object.keys(localeData)) {
+      for (const key of Object.keys(localeData).sort()) {
         localeData[key] = normalizeData(localeData[key]);
       }
 
