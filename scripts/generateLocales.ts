@@ -264,7 +264,6 @@ function updateLocaleFileHook(
       typeof localeData === 'number' ||
       typeof localeData === 'boolean'
     ) {
-      console.log('found primitive locale data', filePath);
       return localeData;
     } else if (localeData === null) {
       return localeData;
