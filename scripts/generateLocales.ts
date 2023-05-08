@@ -319,9 +319,10 @@ function updateLocaleFileHook(
     return;
   }
 
+  // todo: can be deleted - 'D:\\source\\repos\\faker\\src\\locales\\cs_CZ\\location\\state_abbr.ts' is the only one
   const isStaticFile = ['[', '{'].includes(compareString[0]);
   if (!isStaticFile) {
-    return;
+    throw new Error(`Cannot normalize content type: ${filePath}`);
   }
 
   const fileContentPreData = fileContent.substring(0, compareIndex);
